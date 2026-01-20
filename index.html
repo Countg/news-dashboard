@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>News Dashboard</title>
+  <style>
+    :root {
+      --bg: #0f1220;
+      --panel: #171a2c;
+      --text: #e9ecff;
+      --muted: #aab1d6;
+      --line: rgba(255,255,255,.10);
+      --chip: rgba(255,255,255,.08);
+      --shadow: 0 12px 30px rgba(0,0,0,.35);
+      --radius: 16px;
+      --btn: rgba(255,255,255,.06);
+      --btnHover: rgba(255,255,255,.10);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(1200px 800px at 20% 0%, #1b1f3b 0%, var(--bg) 60%);
+      color: var(--text);
+    }
+    header {
+      padding: 28px 22px 18px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    h1 { margin: 0 0 10px; font-size: 28px; letter-spacing: .2px; }
+    .sub { color: var(--muted); font-size: 14px; }
+    .topbar {
+      display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    input[type="search"]{
+      flex: 1;
+      min-width: 220px;
+      padding: 12px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      outline: none;
+    }
+    .btn {
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--btn);
+      color: var(--text);
+      cursor: pointer;
+      user-select: none;
+    }
+    .btn:hover { background: var(--btnHover); }
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 22px 34px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    @media (min-width: 860px){
+      main { grid-template-columns: 2fr 1fr; gap: 16px; }
+    }
+    .card {
+      background: rgba(23,26,44,.78);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .card h2{
+      margin: 0;
+      padding: 14px 16px;
+      font-size: 16px;
+      border-bottom: 1px solid var(--line);
+      color: var(--text);
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 12px;
+    }
+    .meta { color: var(--muted); font-weight: 500; font-size: 12px; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      padding: 14px 16px 16px;
+    }
+    @media (min-width: 620px){
+      .grid { grid-template-columns: 1fr 1fr; }
+    }
+    .section { padding: 6px 0 0; }
+    .labelRow{
+      display:flex; align-items:center; justify-content:space-between;
+      gap: 10px; margin: 0 0 10px;
+    }
+    .label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      margin: 0;
+    }
+    .sectionActions{
+      display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+    }
+    .miniBtn{
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--btn);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .miniBtn:hover { background: var(--btnHover); }
+
+    .links a {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      margin: 8px 0;
+      text-decoration: none;
+      color: var(--text);
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      transition: transform .08s ease, background .2s ease, border-color .2s ease;
+    }
+    .links a:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.08);
+      border-color: rgba(255,255,255,.18);
+    }
+    .chip {
+      font-size: 12px;
+      color: var(--muted);
+      background: var(--chip);
+      border: 1px solid var(--line);
+      padding: 3px 8px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    textarea {
+      width: 100%;
+      min-height: 240px;
+      resize: vertical;
+      padding: 12px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+      outline: none;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+      padding: 0 16px 16px;
+      margin-top: -6px;
+    }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>News Dashboard</h1>
+    <div class="sub">Pinned tab = your permanent source board. Search filters links live. Scratchpad autosaves locally.</div>
+    <div class="topbar">
+      <input id="q" type="search" placeholder="Filter sources (e.g., 'Hamilton', 'horror', 'tech')" />
+      <button class="btn" id="reset">Reset</button>
+      <button class="btn" id="focus">Focus mode</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="card" id="sources">
+      <h2>
+        Sources
+        <span class="meta" id="count"></span>
+      </h2>
+
+      <div class="grid">
+
+        <!-- LOCAL HAMILTON -->
+        <div class="section" data-section="local-hamilton">
+          <div class="labelRow">
+            <p class="label">Local Hamilton</p>
+            <div class="sectionActions">
+              <button class="miniBtn openAll" data-open="local-hamilton">Open all</button>
+            </div>
+          </div>
+          <div class="links">
+            <a href="https://www.cbc.ca/news/canada/hamilton" target="_blank" rel="noopener">
+              CBC Hamilton <span class="chip">local</span>
+            </a>
+            <a href="https://www.thespec.com/" target="_blank" rel="noopener">
+              The Hamilton Spectator <span class="chip">local</span>
+            </a>
+            <a href="https://www.chch.com/" target="_blank" rel="noopener">
+              CHCH News <span class="chip">local</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- CANADA / INDIE -->
+        <div class="section" data-section="canada-indie">
+          <div class="labelRow">
+            <p class="label">Canada / Indie + Accountability</p>
+            <div class="sectionActions">
+              <button class="miniBtn openAll" data-open="canada-indie">Open all</button>
+            </div>
+          </div>
+          <div class="links">
+            <a href="https://www.cbc.ca/news" target="_blank" rel="noopener">
+              CBC News <span class="chip">canada</span>
+            </a>
+            <a href="https://www.thecanadianpressnews.ca/" target="_blank" rel="noopener">
+              The Maple <span class="chip">left</span>
+            </a>
+            <a href="https://thetyee.ca/" target="_blank" rel="noopener">
+              The Tyee <span class="chip">investigations</span>
+            </a>
+            <a href="https://thenarwhal.ca/" target="_blank" rel="noopener">
+              The Narwhal <span class="chip">climate</span>
+            </a>
+            <a href="https://rabble.ca/" target="_blank" rel="noopener">
+              Rabble <span class="chip">analysis</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- AGGREGATION -->
+        <div class="section" data-section="aggregation">
+          <div class="labelRow">
+            <p class="label">Aggregation / “What are they all yelling about?”</p>
+            <div class="sectionActions">
+              <button class="miniBtn openAll" data-open="aggregation">Open all</button>
+            </div>
+          </div>
+          <div class="links">
+            <a href="https://ground.news/" target="_blank" rel="noopener">
+              Ground News <span class="chip">bias-map</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- TECH -->
+        <div class="section" data-section="tech">
+          <div class="labelRow">
+            <p class="label">Tech / Culture (the machine’s weather report)</p>
+            <div class="sectionActions">
+              <button class="miniBtn openAll" data-open="tech">Open all</button>
+            </div>
+          </div>
+          <div class="links">
+            <a href="https://www.404media.co/" target="_blank" rel="noopener">
+              404 Media <span class="chip">power</span>
+            </a>
+            <a href="https://www.theverge.com/" target="_blank" rel="noopener">
+              The Verge <span class="chip">tech</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- MOVIES + COMICS -->
+        <div class="section" data-section="movies-comics">
+          <div class="labelRow">
+            <p class="label">Movies + Comic Books (joy + brain candy)</p>
+            <div class="sectionActions">
+              <button class="miniBtn openAll" data-open="movies-comics">Open all</button>
+            </div>
+          </div>
+          <div class="links">
+            <a href="https://bloody-disgusting.com/" target="_blank" rel="noopener">
+              Bloody Disgusting <span class="chip">horror</span>
+            </a>
+            <a href="https://www.cbr.com/" target="_blank" rel="noopener">
+              CBR <span class="chip">comics</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <aside class="card" id="today">
+      <h2>
+        Today Scratchpad
+        <span class="meta">autosaves</span>
+      </h2>
+      <div style="padding:14px 16px 10px;">
+        <textarea id="pad" placeholder="Drop headlines, links, notes, 'read later' targets…"></textarea>
+      </div>
+      <div class="small">
+        Tags you’ll actually use: <b>[LOCAL]</b> <b>[CAN]</b> <b>[CLIMATE]</b> <b>[TECH]</b> <b>[HORROR]</b> <b>[COMICS]</b> <b>[BIT]</b>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    const q = document.getElementById('q');
+    const reset = document.getElementById('reset');
+    const focus = document.getElementById('focus');
+    const today = document.getElementById('today');
+    const links = Array.from(document.querySelectorAll('.links a'));
+    const count = document.getElementById('count');
+    const pad = document.getElementById('pad');
+
+    function updateCount(){
+      const visible = links.filter(a => !a.classList.contains('hidden')).length;
+      count.textContent = `${visible}/${links.length} links`;
+    }
+
+    function filter(){
+      const term = q.value.trim().toLowerCase();
+      links.forEach(a => {
+        const text = a.textContent.toLowerCase();
+        a.classList.toggle('hidden', term && !text.includes(term));
+      });
+      updateCount();
+    }
+
+    q.addEventListener('input', filter);
+    reset.addEventListener('click', () => { q.value = ''; filter(); q.focus(); });
+
+    let focused = false;
+    focus.addEventListener('click', () => {
+      focused = !focused;
+      today.style.display = focused ? 'none' : '';
+      focus.textContent = focused ? 'Unfocus' : 'Focus mode';
+    });
+
+    // Scratchpad autosave (local browser storage)
+    const KEY = 'news_dashboard_pad_v1';
+    pad.value = localStorage.getItem(KEY) || '';
+    pad.addEventListener('input', () => localStorage.setItem(KEY, pad.value));
+
+    // Open all links in a section
+    document.querySelectorAll('.openAll').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const sectionName = btn.getAttribute('data-open');
+        const section = document.querySelector(`[data-section="${sectionName}"]`);
+        const sectionLinks = Array.from(section.querySelectorAll('a'));
+        sectionLinks.forEach((a, i) => {
+          setTimeout(() => window.open(a.href, "_blank", "noopener"), i * 120);
+        });
+      });
+    });
+
+    updateCount();
+  </script>
+</body>
+</html>
