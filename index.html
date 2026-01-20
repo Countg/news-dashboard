@@ -4,48 +4,170 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>News Dashboard</title>
+
+  <!-- FAVICON -->
+  <!-- Quick emoji favicon (works in most browsers) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+  <!-- If you later want a real favicon file:
+       1) create favicon.ico
+       2) put it beside this HTML file
+       3) uncomment below -->
+  <!-- <link rel="icon" href="favicon.ico"> -->
+
   <style>
     :root {
-      --bg: #0f1220;
-      --panel: #171a2c;
-      --text: #e9ecff;
-      --muted: #aab1d6;
-      --line: rgba(255,255,255,.10);
+      /* Your palette */
+      --bg: #1e1b4b;
+      --panel: rgba(255,255,255,.06);
+      --panel2: rgba(255,255,255,.045);
+      --text: #f2f2ff;
+      --muted: rgba(242,242,255,.70);
+      --line: rgba(255,255,255,.12);
       --chip: rgba(255,255,255,.08);
-      --shadow: 0 12px 30px rgba(0,0,0,.35);
-      --radius: 16px;
-      --btn: rgba(255,255,255,.06);
-      --btnHover: rgba(255,255,255,.10);
+      --shadow: 0 14px 40px rgba(0,0,0,.35);
+      --radius: 18px;
+
+      --accent: #FF6719;
+      --accentSoft: rgba(255,103,25,.18);
+
+      --good: rgba(80, 220, 140, .18);
+      --bad: rgba(255, 120, 120, .16);
+
+      --btn: rgba(255,255,255,.08);
+      --btnHover: rgba(255,255,255,.12);
     }
+
     * { box-sizing: border-box; }
-    body {
+
+    body{
       margin: 0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      background: radial-gradient(1200px 800px at 20% 0%, #1b1f3b 0%, var(--bg) 60%);
       color: var(--text);
+      background:
+        radial-gradient(1200px 700px at 20% 0%, rgba(255,103,25,.12) 0%, rgba(255,103,25,0) 55%),
+        radial-gradient(900px 700px at 85% 10%, rgba(255,255,255,.08) 0%, rgba(255,255,255,0) 55%),
+        linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.35)),
+        var(--bg);
+      min-height: 100vh;
     }
-    header {
-      padding: 28px 22px 18px;
-      max-width: 1100px;
+
+    header{
+      padding: 26px 22px 16px;
+      max-width: 1120px;
       margin: 0 auto;
     }
-    h1 { margin: 0 0 10px; font-size: 28px; letter-spacing: .2px; }
-    .sub { color: var(--muted); font-size: 14px; }
-    .topbar {
-      display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
-      margin-top: 16px;
+
+    h1{
+      margin: 0 0 10px;
+      font-size: 28px;
+      letter-spacing: .2px;
+      display: inline-flex;
+      align-items: baseline;
+      gap: 10px;
     }
+
+    .brandMark{
+      display:inline-block;
+      font-size: 14px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--accentSoft);
+      color: var(--text);
+    }
+
+    .sub{
+      color: var(--muted);
+      font-size: 14px;
+      max-width: 900px;
+      line-height: 1.35;
+    }
+
+    .statusBar{
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 14px;
+    }
+
+    .pill{
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      font-size: 13px;
+      color: var(--text);
+      box-shadow: 0 10px 26px rgba(0,0,0,.18);
+    }
+
+    .pill small{ color: var(--muted); font-size: 12px; }
+    .pill.good{ background: var(--good); }
+    .pill.bad{ background: var(--bad); }
+
+    .wxCore{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .wxSignal{
+      width: 66px;
+      height: 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--panel2);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* tiny animated "signal line" */
+    .wxSignal::before{
+      content:"";
+      position:absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg,
+          rgba(255,103,25,0) 0%,
+          rgba(255,103,25,.65) 22%,
+          rgba(255,103,25,.95) 50%,
+          rgba(255,103,25,.65) 78%,
+          rgba(255,103,25,0) 100%);
+      transform: translateX(-80%);
+      animation: sweep 2.2s linear infinite;
+      opacity: .85;
+    }
+    @keyframes sweep{
+      0%{ transform: translateX(-80%); }
+      100%{ transform: translateX(80%); }
+    }
+
+    .topbar{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
     input[type="search"]{
-      flex: 1;
+      flex:1;
       min-width: 220px;
       padding: 12px 14px;
       border-radius: 999px;
       border: 1px solid var(--line);
-      background: rgba(255,255,255,.06);
+      background: rgba(255,255,255,.07);
       color: var(--text);
       outline: none;
     }
-    .btn {
+
+    input[type="search"]::placeholder{ color: rgba(242,242,255,.55); }
+
+    .btn{
       padding: 10px 14px;
       border-radius: 999px;
       border: 1px solid var(--line);
@@ -53,125 +175,196 @@
       color: var(--text);
       cursor: pointer;
       user-select: none;
+      box-shadow: 0 10px 22px rgba(0,0,0,.18);
     }
-    .btn:hover { background: var(--btnHover); }
-    main {
-      max-width: 1100px;
+    .btn:hover{ background: var(--btnHover); }
+    .btn.accent{
+      border-color: rgba(255,103,25,.55);
+      background: rgba(255,103,25,.16);
+    }
+    .btn.accent:hover{ background: rgba(255,103,25,.22); }
+
+    main{
+      max-width: 1120px;
       margin: 0 auto;
       padding: 0 22px 34px;
-      display: grid;
+      display:grid;
       grid-template-columns: 1fr;
       gap: 14px;
     }
     @media (min-width: 860px){
-      main { grid-template-columns: 2fr 1fr; gap: 16px; }
+      main{ grid-template-columns: 2fr 1fr; gap: 16px; }
     }
-    .card {
-      background: rgba(23,26,44,.78);
+
+    .card{
+      background: rgba(255,255,255,.05);
       border: 1px solid var(--line);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       overflow: hidden;
+      backdrop-filter: blur(6px);
     }
+
     .card h2{
       margin: 0;
       padding: 14px 16px;
       font-size: 16px;
       border-bottom: 1px solid var(--line);
-      color: var(--text);
-      display: flex; justify-content: space-between; align-items: center;
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
       gap: 12px;
     }
-    .meta { color: var(--muted); font-weight: 500; font-size: 12px; }
-    .grid {
-      display: grid;
+
+    .meta{ color: var(--muted); font-weight: 600; font-size: 12px; }
+
+    .grid{
+      display:grid;
       grid-template-columns: 1fr;
       gap: 10px;
       padding: 14px 16px 16px;
     }
     @media (min-width: 620px){
-      .grid { grid-template-columns: 1fr 1fr; }
+      .grid{ grid-template-columns: 1fr 1fr; }
     }
-    .section { padding: 6px 0 0; }
+
+    .section{ padding: 6px 0 0; }
+
     .labelRow{
-      display:flex; align-items:center; justify-content:space-between;
-      gap: 10px; margin: 0 0 10px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      margin: 0 0 10px;
     }
-    .label {
+
+    .label{
       font-size: 12px;
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: .12em;
       margin: 0;
     }
-    .sectionActions{
-      display:flex; gap:8px; align-items:center; flex-wrap:wrap;
-    }
+
+    .sectionActions{ display:flex; gap: 8px; align-items:center; flex-wrap:wrap; }
+
     .miniBtn{
       padding: 6px 10px;
       border-radius: 999px;
       border: 1px solid var(--line);
-      background: var(--btn);
+      background: rgba(255,255,255,.07);
       color: var(--text);
-      cursor: pointer;
+      cursor:pointer;
       font-size: 12px;
     }
-    .miniBtn:hover { background: var(--btnHover); }
+    .miniBtn:hover{ background: rgba(255,255,255,.11); }
 
-    .links a {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .links a{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
       gap: 10px;
       padding: 10px 12px;
       margin: 8px 0;
-      text-decoration: none;
+      text-decoration:none;
       color: var(--text);
-      background: rgba(255,255,255,.05);
+      background: rgba(0,0,0,.10);
       border: 1px solid var(--line);
       border-radius: 12px;
       transition: transform .08s ease, background .2s ease, border-color .2s ease;
     }
+
     .links a:hover{
       transform: translateY(-1px);
-      background: rgba(255,255,255,.08);
-      border-color: rgba(255,255,255,.18);
+      background: rgba(0,0,0,.16);
+      border-color: rgba(255,103,25,.35);
     }
-    .chip {
+
+    .chip{
       font-size: 12px;
-      color: var(--muted);
-      background: var(--chip);
+      color: rgba(242,242,255,.72);
+      background: rgba(255,255,255,.07);
       border: 1px solid var(--line);
       padding: 3px 8px;
       border-radius: 999px;
       white-space: nowrap;
     }
-    textarea {
+
+    textarea{
       width: 100%;
       min-height: 240px;
       resize: vertical;
       padding: 12px 12px;
       border-radius: 12px;
       border: 1px solid var(--line);
-      background: rgba(255,255,255,.05);
+      background: rgba(0,0,0,.12);
       color: var(--text);
       outline: none;
       font-size: 14px;
       line-height: 1.5;
     }
-    .small {
+
+    textarea::placeholder{ color: rgba(242,242,255,.52); }
+
+    .small{
       font-size: 12px;
       color: var(--muted);
       padding: 0 16px 16px;
       margin-top: -6px;
+      line-height: 1.35;
     }
-    .hidden { display: none !important; }
+
+    .hidden{ display:none !important; }
+
+    .mood{
+      display:inline-flex;
+      gap: 8px;
+      align-items: baseline;
+      margin-left: 6px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,103,25,.45);
+      background: rgba(255,103,25,.12);
+      color: rgba(242,242,255,.92);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .mood b{ color: var(--accent); font-weight: 700; }
   </style>
 </head>
+
 <body>
   <header>
-    <h1>News Dashboard</h1>
-    <div class="sub">Pinned tab = your permanent source board. Search filters links live. Scratchpad autosaves locally.</div>
+    <h1>
+      News Dashboard
+      <span class="brandMark">lo-fi control room</span>
+    </h1>
+    <div class="sub">
+      Your pinned source board + a scratchpad. Date/time updates automatically. Weather/location works when you allow it.
+      <span class="mood" id="moodPill" title="Weather-generated vibe report">mood: <b>unknown</b></span>
+    </div>
+
+    <div class="statusBar">
+      <div class="pill" id="datePill">📅 <span id="dateText">Loading date…</span></div>
+
+      <div class="pill" id="locPill">
+        📍 <span id="locText">Location: not set</span>
+      </div>
+
+      <div class="pill" id="wxPill">
+        <div class="wxCore">
+          🌤️ <span id="wxText">Weather: not loaded</span>
+          <span class="wxSignal" aria-hidden="true"></span>
+        </div>
+      </div>
+
+      <div class="pill" id="sunPill">🌅 <span id="sunText">Sun: not loaded</span></div>
+
+      <button class="btn accent" id="getWeather">Get my weather</button>
+      <button class="btn" id="refreshWeather">Refresh</button>
+    </div>
+
     <div class="topbar">
       <input id="q" type="search" placeholder="Filter sources (e.g., 'Hamilton', 'horror', 'tech')" />
       <button class="btn" id="reset">Reset</button>
@@ -187,7 +380,6 @@
       </h2>
 
       <div class="grid">
-
         <!-- LOCAL HAMILTON -->
         <div class="section" data-section="local-hamilton">
           <div class="labelRow">
@@ -239,7 +431,7 @@
         <!-- AGGREGATION -->
         <div class="section" data-section="aggregation">
           <div class="labelRow">
-            <p class="label">Aggregation / “What are they all yelling about?”</p>
+            <p class="label">Aggregation</p>
             <div class="sectionActions">
               <button class="miniBtn openAll" data-open="aggregation">Open all</button>
             </div>
@@ -254,7 +446,7 @@
         <!-- TECH -->
         <div class="section" data-section="tech">
           <div class="labelRow">
-            <p class="label">Tech / Culture (the machine’s weather report)</p>
+            <p class="label">Tech / Culture</p>
             <div class="sectionActions">
               <button class="miniBtn openAll" data-open="tech">Open all</button>
             </div>
@@ -272,7 +464,7 @@
         <!-- MOVIES + COMICS -->
         <div class="section" data-section="movies-comics">
           <div class="labelRow">
-            <p class="label">Movies + Comic Books (joy + brain candy)</p>
+            <p class="label">Movies + Comic Books</p>
             <div class="sectionActions">
               <button class="miniBtn openAll" data-open="movies-comics">Open all</button>
             </div>
@@ -299,19 +491,20 @@
         <textarea id="pad" placeholder="Drop headlines, links, notes, 'read later' targets…"></textarea>
       </div>
       <div class="small">
-        Tags you’ll actually use: <b>[LOCAL]</b> <b>[CAN]</b> <b>[CLIMATE]</b> <b>[TECH]</b> <b>[HORROR]</b> <b>[COMICS]</b> <b>[BIT]</b>
+        Tags: <b>[LOCAL]</b> <b>[CAN]</b> <b>[CLIMATE]</b> <b>[TECH]</b> <b>[HORROR]</b> <b>[COMICS]</b> <b>[BIT]</b><br/>
+        Pro tip: when you paste a link, add one sentence: “Why am I saving this?” Future-you will thank you.
       </div>
     </aside>
   </main>
 
   <script>
+    // -------------------- FILTER + UI --------------------
     const q = document.getElementById('q');
     const reset = document.getElementById('reset');
     const focus = document.getElementById('focus');
     const today = document.getElementById('today');
     const links = Array.from(document.querySelectorAll('.links a'));
     const count = document.getElementById('count');
-    const pad = document.getElementById('pad');
 
     function updateCount(){
       const visible = links.filter(a => !a.classList.contains('hidden')).length;
@@ -337,12 +530,7 @@
       focus.textContent = focused ? 'Unfocus' : 'Focus mode';
     });
 
-    // Scratchpad autosave (local browser storage)
-    const KEY = 'news_dashboard_pad_v1';
-    pad.value = localStorage.getItem(KEY) || '';
-    pad.addEventListener('input', () => localStorage.setItem(KEY, pad.value));
-
-    // Open all links in a section
+    // Open all links in a section (staggered so browsers don't scream "popups!")
     document.querySelectorAll('.openAll').forEach(btn => {
       btn.addEventListener('click', () => {
         const sectionName = btn.getAttribute('data-open');
@@ -354,7 +542,308 @@
       });
     });
 
+    // Scratchpad autosave
+    const pad = document.getElementById('pad');
+    const PAD_KEY = 'news_dashboard_pad_v3';
+    pad.value = localStorage.getItem(PAD_KEY) || '';
+    pad.addEventListener('input', () => localStorage.setItem(PAD_KEY, pad.value));
+
+    // -------------------- DATE/TIME --------------------
+    const dateText = document.getElementById('dateText');
+    function updateDateTime(){
+      const now = new Date();
+      const formatted = now.toLocaleString(undefined, {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+      dateText.textContent = formatted;
+    }
+    updateDateTime();
+    setInterval(updateDateTime, 15000);
+
+    // -------------------- LOCATION + WEATHER --------------------
+    const locText = document.getElementById('locText');
+    const wxText = document.getElementById('wxText');
+    const sunText = document.getElementById('sunText');
+
+    const locPill = document.getElementById('locPill');
+    const wxPill = document.getElementById('wxPill');
+    const sunPill = document.getElementById('sunPill');
+
+    const getWeatherBtn = document.getElementById('getWeather');
+    const refreshWeatherBtn = document.getElementById('refreshWeather');
+
+    const moodPill = document.getElementById('moodPill');
+
+    const GEO_KEY = 'news_dashboard_geo_v1';      // {lat, lon, ts}
+    const WX_KEY  = 'news_dashboard_wx_v1';       // cached last response string + sun times + mood
+    const GEO_TTL_MS = 6 * 60 * 60 * 1000;        // 6 hours for coords cache
+    const WX_TTL_MS  = 30 * 60 * 1000;            // 30 minutes weather cache
+
+    function setMood(label){
+      moodPill.innerHTML = `mood: <b>${label}</b>`;
+    }
+
+    function weatherCodeToText(code){
+      const map = {
+        0: "Clear",
+        1: "Mainly clear",
+        2: "Partly cloudy",
+        3: "Overcast",
+        45: "Fog",
+        48: "Rime fog",
+        51: "Light drizzle",
+        53: "Drizzle",
+        55: "Heavy drizzle",
+        61: "Light rain",
+        63: "Rain",
+        65: "Heavy rain",
+        71: "Light snow",
+        73: "Snow",
+        75: "Heavy snow",
+        80: "Rain showers",
+        81: "Showers",
+        82: "Violent showers",
+        95: "Thunderstorm",
+        96: "Thunderstorm + hail",
+        99: "Thunderstorm + heavy hail"
+      };
+      return map[code] || `Weather code ${code}`;
+    }
+
+    function moodFromCode(code){
+      // A working theory: mood is just weather with narrative.
+      if (code === 0) return "clear skies, suspiciously optimistic";
+      if (code === 1 || code === 2) return "decent vibes, still capitalism";
+      if (code === 3) return "overcast: the universe is buffering";
+      if (code === 45 || code === 48) return "fog: reality’s soft-launch";
+      if ([51,53,55].includes(code)) return "drizzle: mild inconvenience doctrine";
+      if ([61,63,65].includes(code)) return "rain: ambient existential percussion";
+      if ([71,73,75].includes(code)) return "snow: silence with consequences";
+      if ([80,81,82].includes(code)) return "showers: chaos doing cardio";
+      if ([95,96,99].includes(code)) return "thunder: the gods are subtweeting";
+      return "uncategorized weather: interpretive dance";
+    }
+
+    function pillState(el, state){
+      el.classList.remove("good","bad");
+      if (state === "good") el.classList.add("good");
+      if (state === "bad") el.classList.add("bad");
+    }
+
+    async function reverseGeocodeOpenMeteo(lat, lon){
+      // Open-Meteo reverse geocoding (no key)
+      const url = `https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}&longitude=${lon}&language=en&format=json`;
+      const r = await fetch(url);
+      if(!r.ok) throw new Error("Reverse geocode failed");
+      const data = await r.json();
+      const best = data?.results?.[0];
+      if(!best) return `Lat ${lat.toFixed(3)}, Lon ${lon.toFixed(3)}`;
+      const parts = [];
+      if (best.name) parts.push(best.name);
+      if (best.admin1) parts.push(best.admin1);
+      if (best.country_code) parts.push(best.country_code);
+      return parts.join(", ");
+    }
+
+    async function fetchWeather(lat, lon){
+      // current + daily sunrise/sunset, timezone auto so displayed values match local
+      const url =
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+        `&current=temperature_2m,weather_code,wind_speed_10m` +
+        `&daily=sunrise,sunset` +
+        `&temperature_unit=celsius&wind_speed_unit=kmh&timezone=auto`;
+
+      const r = await fetch(url);
+      if(!r.ok) throw new Error("Weather request failed");
+      return await r.json();
+    }
+
+    function formatTime(isoString){
+      // isoString is already in local timezone per API when timezone=auto
+      const d = new Date(isoString);
+      return d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+    }
+
+    function applyWeatherUI(payload){
+      const temp = payload.current.temperature_2m;
+      const wind = payload.current.wind_speed_10m;
+      const code = payload.current.weather_code;
+      const desc = weatherCodeToText(code);
+
+      wxText.textContent = `Weather: ${temp}°C • ${desc} • Wind ${wind} km/h`;
+      pillState(wxPill, "good");
+
+      const sunrise = payload.daily?.sunrise?.[0];
+      const sunset  = payload.daily?.sunset?.[0];
+      if (sunrise && sunset){
+        sunText.textContent = `Sun: ↑ ${formatTime(sunrise)} • ↓ ${formatTime(sunset)}`;
+        pillState(sunPill, "good");
+      } else {
+        sunText.textContent = `Sun: not available`;
+        pillState(sunPill, "bad");
+      }
+
+      setMood(moodFromCode(code));
+    }
+
+    function loadCachedWeather(){
+      try{
+        const cached = JSON.parse(localStorage.getItem(WX_KEY) || "null");
+        if(!cached) return false;
+        if(Date.now() - cached.ts > WX_TTL_MS) return false;
+
+        wxText.textContent = cached.wxText;
+        sunText.textContent = cached.sunText;
+        setMood(cached.mood || "cached vibes");
+        pillState(wxPill, "good");
+        pillState(sunPill, "good");
+        return true;
+      }catch(e){
+        return false;
+      }
+    }
+
+    function saveCachedWeather(){
+      const cached = {
+        ts: Date.now(),
+        wxText: wxText.textContent,
+        sunText: sunText.textContent,
+        mood: moodPill.textContent.replace("mood:", "").trim()
+      };
+      localStorage.setItem(WX_KEY, JSON.stringify(cached));
+    }
+
+    function loadCachedGeo(){
+      try{
+        const g = JSON.parse(localStorage.getItem(GEO_KEY) || "null");
+        if(!g) return null;
+        if(Date.now() - g.ts > GEO_TTL_MS) return null;
+        return g;
+      }catch(e){
+        return null;
+      }
+    }
+
+    function saveGeo(lat, lon){
+      localStorage.setItem(GEO_KEY, JSON.stringify({lat, lon, ts: Date.now()}));
+    }
+
+    async function updateFromCoords(lat, lon){
+      // Location name
+      try{
+        const name = await reverseGeocodeOpenMeteo(lat, lon);
+        locText.textContent = `Location: ${name}`;
+        pillState(locPill, "good");
+      }catch(e){
+        locText.textContent = `Location: Lat ${lat.toFixed(3)}, Lon ${lon.toFixed(3)}`;
+        pillState(locPill, "bad");
+      }
+
+      // Weather
+      wxText.textContent = "Weather: fetching…";
+      sunText.textContent = "Sun: fetching…";
+      pillState(wxPill, "good");
+      pillState(sunPill, "good");
+
+      try{
+        const payload = await fetchWeather(lat, lon);
+        applyWeatherUI(payload);
+        saveCachedWeather();
+      }catch(e){
+        wxText.textContent = "Weather: failed to load";
+        sunText.textContent = "Sun: failed to load";
+        pillState(wxPill, "bad");
+        pillState(sunPill, "bad");
+        setMood("api vibes: rejected");
+      }
+    }
+
+    async function getLocationAndWeatherPrompt(){
+      if(!navigator.geolocation){
+        locText.textContent = "Location: not supported";
+        pillState(locPill, "bad");
+        wxText.textContent = "Weather: not available";
+        sunText.textContent = "Sun: not available";
+        pillState(wxPill, "bad");
+        pillState(sunPill, "bad");
+        setMood("no geolocation: vibes undefined");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        saveGeo(lat, lon);
+        await updateFromCoords(lat, lon);
+      }, () => {
+        locText.textContent = "Location: blocked or unavailable";
+        pillState(locPill, "bad");
+        wxText.textContent = "Weather: needs location permission";
+        sunText.textContent = "Sun: needs location permission";
+        pillState(wxPill, "bad");
+        pillState(sunPill, "bad");
+        setMood("permission denied: classic human move");
+      }, {
+        enableHighAccuracy: false,
+        timeout: 9000,
+        maximumAge: 300000
+      });
+    }
+
+    // Buttons
+    getWeatherBtn.addEventListener('click', getLocationAndWeatherPrompt);
+
+    refreshWeatherBtn.addEventListener('click', async () => {
+      const g = loadCachedGeo();
+      if(!g){
+        // no cached coords — must prompt to refresh
+        await getLocationAndWeatherPrompt();
+        return;
+      }
+      await updateFromCoords(g.lat, g.lon);
+    });
+
+    // On load:
     updateCount();
+
+    // Load cached weather first so it's not empty
+    const hadWeather = loadCachedWeather();
+
+    // If coords cached, we can refresh weather silently later (no prompt). We'll do a gentle refresh
+    // if cache is stale.
+    const g = loadCachedGeo();
+    if(g){
+      // Also show location quickly (without forcing weather if user doesn't want)
+      // We'll fetch location name once, and only refresh weather if cached weather is stale.
+      (async () => {
+        try{
+          const name = await reverseGeocodeOpenMeteo(g.lat, g.lon);
+          locText.textContent = `Location: ${name}`;
+          pillState(locPill, "good");
+        }catch{
+          locText.textContent = `Location: Lat ${g.lat.toFixed(3)}, Lon ${g.lon.toFixed(3)}`;
+          pillState(locPill, "bad");
+        }
+
+        // If no cached weather, or it's stale, refresh in background (no location prompt)
+        const cached = JSON.parse(localStorage.getItem(WX_KEY) || "null");
+        const stale = !cached || (Date.now() - cached.ts > WX_TTL_MS);
+        if(stale){
+          await updateFromCoords(g.lat, g.lon);
+        } else if(!hadWeather){
+          loadCachedWeather();
+        }
+      })();
+    } else {
+      // No coords cached: set a default mood
+      setMood("unknown: please locate the meat suit");
+      pillState(locPill, "bad");
+    }
   </script>
 </body>
 </html>
