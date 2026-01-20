@@ -205,6 +205,16 @@
       <h2>Scratchpad <span class="meta">autosaves + Google log</span></h2>
       <div style="padding:14px 16px 10px;">
         <textarea id="pad" placeholder="Drop headlines, links, notes…"></textarea>
+        <input id="tags" type="text" placeholder="Tags (e.g., LOCAL, TECH, HORROR, BIT)" style="
+  width:100%;
+  margin-top:10px;
+  padding:12px 14px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(0,0,0,.12);
+  color:#f2f2ff;
+  outline:none;
+">
 
         <div class="saveRow">
           <button class="btn accent" id="saveToGoogle">Save to Google</button>
@@ -223,20 +233,7 @@
   </main>
 
   <script>
-    // =========================
-    // GOOGLE FORM SETUP (YOU PROVIDED THESE)
-    // =========================
-    const GOOGLE_FORM_VIEW_URL =
-      "https://docs.google.com/forms/d/e/1FAIpQLSf-IQVRs31cxHjA_5LVIogmjEYuJg-G4p_pWzOZrAzx-sh5jA/viewform";
 
-    // This is the ONLY missing piece: the entry ID for your "Note" field.
-    // You get it from a "pre-filled link" in Google Forms. It looks like entry.123456789
-    // Put ONLY the number part after "entry." below.
-    const GOOGLE_FORM_ENTRY_ID_FOR_NOTE = "1595342700";
-
-    // If you have (or later create) a Responses Sheet, put its URL here.
-    // In Forms: Responses tab → "View in Sheets" → copy that URL.
-    const GOOGLE_RESPONSES_SHEET_URL = "https://docs.google.com/spreadsheets/d/1SW5Ra36eUJYd3GWiPr08KbK08q9DR5TSbZh3gkrncX4/edit?usp=sharing";
 
     // =========================
     // FILTER + UI
@@ -512,6 +509,8 @@
     pad.value = localStorage.getItem(PAD_KEY) || '';
     pad.addEventListener('input', () => localStorage.setItem(PAD_KEY, pad.value));
 
+    
+
     openFormBtn.addEventListener('click', () => window.open(GOOGLE_FORM_VIEW_URL, "_blank", "noopener"));
 
     openResponsesBtn.addEventListener('click', () => {
@@ -528,49 +527,59 @@
       });
     }
 
-    function buildFormResponseUrl(noteText){
-      // Google Forms accepts submissions at /formResponse with entry.<id>=VALUE
-      // Your provided URL is a /viewform; we convert it.
-      const formResponseBase = GOOGLE_FORM_VIEW_URL.replace("/viewform", "/formResponse");
+        // =========================
+    // GOOGLE FORM SETUP (YOU PROVIDED THESE)
+    // =========================
+const GOOGLE_FORM_VIEW_URL =
+  "https://docs.google.com/forms/d/e/1FAIpQLSf-IQVRs31cxHjA_5LVIogmjEYuJg-G4p_pWzOZrAzx-sh5jA/viewform";
 
-      if (!GOOGLE_FORM_ENTRY_ID_FOR_NOTE || GOOGLE_FORM_ENTRY_ID_FOR_NOTE === "REPLACE_ME_WITH_NUMBER"){
-        throw new Error("Missing entry ID for Note field. See comment in code.");
-      }
+const GOOGLE_ENTRY_NOTE = "1595342700";
+const GOOGLE_ENTRY_TAGS = "1912444628";
 
-      const entryKey = `entry.${GOOGLE_FORM_ENTRY_ID_FOR_NOTE}`;
-      const params = new URLSearchParams();
-      params.set(entryKey, noteText);
+    // If you have (or later create) a Responses Sheet, put its URL here.
+    // In Forms: Responses tab → "View in Sheets" → copy that URL.
+    const GOOGLE_RESPONSES_SHEET_URL = "https://docs.google.com/spreadsheets/d/1SW5Ra36eUJYd3GWiPr08KbK08q9DR5TSbZh3gkrncX4/edit?usp=sharing";
+    
 
-      // "submit=Submit" helps some forms, harmless if ignored
-      params.set("submit", "Submit");
 
-      return `${formResponseBase}?${params.toString()}`;
-    }
+function buildFormResponseUrl(noteText, tagsText){
+  // Converts /viewform to /formResponse for submission
+  const formResponseBase = GOOGLE_FORM_VIEW_URL.replace("/viewform", "/formResponse");
 
-    saveToGoogleBtn.addEventListener('click', () => {
-      const text = pad.value.trim();
-      if (!text){
-        saveStatus.textContent = "Nothing to save.";
-        return;
-      }
+  const params = new URLSearchParams();
+  params.set(`entry.${GOOGLE_ENTRY_NOTE}`, noteText);
+  params.set(`entry.${GOOGLE_ENTRY_TAGS}`, tagsText || "");
+  params.set("submit", "Submit");
 
-      saveStatus.textContent = "Saving to Google…";
+  return `${formResponseBase}?${params.toString()}`;
+}
 
-      const payload = `[${nowStamp()}] ${text}`;
+saveToGoogleBtn.addEventListener('click', () => {
+  const text = pad.value.trim();
+  const tags = (document.getElementById("tags")?.value || "").trim();
 
-      try{
-        const url = buildFormResponseUrl(payload);
+  if (!text){
+    saveStatus.textContent = "Nothing to save.";
+    return;
+  }
 
-        // Silent-ish submit via hidden iframe (avoids popup blockers)
-        const iframe = document.getElementsByName("hidden_iframe")[0];
-        iframe.src = url;
+  saveStatus.textContent = "Submitting…";
 
-        // Feedback
-        setTimeout(() => { saveStatus.textContent = "Saved to Google ✔"; }, 500);
-      }catch(e){
-        saveStatus.textContent = "Couldn’t save: missing Form entry ID (see code comment).";
-      }
-    });
+  const payload = `[${nowStamp()}] ${text}`;
+
+  try{
+    const url = buildFormResponseUrl(payload, tags);
+
+    // Most reliable: open a submission tab briefly (avoids iframe/CORS issues)
+    const w = window.open(url, "_blank", "noopener,noreferrer");
+    setTimeout(() => { if (w) w.close(); }, 900);
+
+    saveStatus.textContent = "Saved to Google ✔";
+  } catch (e){
+    saveStatus.textContent = "Save failed — check form settings or IDs.";
+  }
+});
+
   </script>
 </body>
 </html>
