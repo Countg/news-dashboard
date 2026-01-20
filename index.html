@@ -488,8 +488,15 @@
         <span class="meta">autosaves</span>
       </h2>
       <div style="padding:14px 16px 10px;">
-        <textarea id="pad" placeholder="Drop headlines, links, notes, 'read later' targets…"></textarea>
-      </div>
+  <textarea id="pad" placeholder="Drop headlines, links, notes, 'read later' targets…"></textarea>
+
+  <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+    <button class="btn accent" id="saveToGoogle">Save to Google</button>
+    <button class="btn" id="openLog">Open log</button>
+    <span style="color: rgba(242,242,255,.70); font-size: 12px;" id="saveStatus"></span>
+  </div>
+</div>
+ß
       <div class="small">
         Tags: <b>[LOCAL]</b> <b>[CAN]</b> <b>[CLIMATE]</b> <b>[TECH]</b> <b>[HORROR]</b> <b>[COMICS]</b> <b>[BIT]</b><br/>
         Pro tip: when you paste a link, add one sentence: “Why am I saving this?” Future-you will thank you.
@@ -547,6 +554,53 @@
     const PAD_KEY = 'news_dashboard_pad_v3';
     pad.value = localStorage.getItem(PAD_KEY) || '';
     pad.addEventListener('input', () => localStorage.setItem(PAD_KEY, pad.value));
+
+    // ---------- SAVE TO GOOGLE FORM (LOGS INTO SHEET) ----------
+// Paste your Google Form "prefill" URL here (more below)
+const GOOGLE_FORM_POST_URL = "https://docs.google.com/forms/d/e/1FAIpQLSf-IQVRs31cxHjA_5LVIogmjEYuJg-G4p_pWzOZrAzx-sh5jA/viewform?usp=publish-editor";
+const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1SW5Ra36eUJYd3GWiPr08KbK08q9DR5TSbZh3gkrncX4/edit?usp=sharing";
+
+const saveBtn = document.getElementById("saveToGoogle");
+const openLogBtn = document.getElementById("openLog");
+const saveStatus = document.getElementById("saveStatus");
+
+function nowStamp(){
+  const d = new Date();
+  return d.toLocaleString(undefined, {
+    year:"numeric", month:"short", day:"2-digit",
+    hour:"2-digit", minute:"2-digit"
+  });
+}
+
+saveBtn.addEventListener("click", async () => {
+  const text = pad.value.trim();
+  if(!text){
+    saveStatus.textContent = "Nothing to save.";
+    return;
+  }
+
+  saveStatus.textContent = "Saving…";
+
+  try{
+    // IMPORTANT:
+    // This uses a simple GET request to the form (works if you use prefilled entry IDs).
+    // We'll wire the exact entry ID after you generate a prefilled link.
+    const url = GOOGLE_FORM_POST_URL + encodeURIComponent(`[${nowStamp()}] ` + text);
+
+    // Open in a small hidden window so it actually submits
+    const w = window.open(url, "_blank", "noopener,noreferrer");
+    setTimeout(() => { if(w) w.close(); }, 800);
+
+    saveStatus.textContent = "Saved to Google ✔";
+  } catch(e){
+    saveStatus.textContent = "Save failed (check form URL).";
+  }
+});
+
+openLogBtn.addEventListener("click", () => {
+  window.open(GOOGLE_SHEET_URL, "_blank", "noopener");
+});
+
 
     // -------------------- DATE/TIME --------------------
     const dateText = document.getElementById('dateText');
