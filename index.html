@@ -553,10 +553,10 @@ function buildFormResponseUrl(noteText, tagsText){
 
   return `${formResponseBase}?${params.toString()}`;
 }
-
 saveToGoogleBtn.addEventListener('click', () => {
   const text = pad.value.trim();
-  const tags = (document.getElementById("tags")?.value || "").trim();
+  const tagsEl = document.getElementById("tags");
+  const tags = (tagsEl?.value || "").trim();
 
   if (!text){
     saveStatus.textContent = "Nothing to save.";
@@ -570,15 +570,23 @@ saveToGoogleBtn.addEventListener('click', () => {
   try{
     const url = buildFormResponseUrl(payload, tags);
 
-    // Most reliable: open a submission tab briefly (avoids iframe/CORS issues)
     const w = window.open(url, "_blank", "noopener,noreferrer");
     setTimeout(() => { if (w) w.close(); }, 900);
 
     saveStatus.textContent = "Saved to Google ✔";
+
+    // ✅ Clear the scratchpad + tags
+    pad.value = "";
+    if (tagsEl) tagsEl.value = "";
+
+    // ✅ Clear the autosaved local storage version too
+    localStorage.setItem(PAD_KEY, "");
+
   } catch (e){
     saveStatus.textContent = "Save failed — check form settings or IDs.";
   }
 });
+
 
   </script>
 </body>
